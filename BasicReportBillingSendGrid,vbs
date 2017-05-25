@@ -1,0 +1,46 @@
+Dim oFS, sSourceFdr, sDestFdr, sFile, sExt
+Dim objMail, objConf, objFlds
+
+Fldr = "X:\BasicReportBilling\"
+FldrArch = "X:\BasicReportBilling\Archive\"
+Set FSO = CreateObject("Scripting.FileSystemObject")
+Set ofolder = fso.getfolder(Fldr)
+
+For each f in ofolder.files
+
+	If instr(f.Name,".pdf") Then
+		
+		Set objMail = CreateObject("CDO.Message")
+		Set objConf = CreateObject("CDO.Configuration")
+		Set objFlds = objConf.Fields
+		Set oFS = WScript.CreateObject("Scripting.FileSystemObject")
+		'objFlds.Item("http://schemas.microsoft.com/cdo/configuration/smtpusessl") = True
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2 
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "smtp.sendgrid.net"
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 25 'Confirmation Required THis is SSL TLS = 587
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/sendusername") = "XXXXXX"
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "XXXXXX"
+		objFlds.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1 'Confirmation Required
+		objFlds.Update
+		objMail.Configuration = objConf
+		objMail.From = "XXXXX"
+		objMail.To = "XXXXX"
+		objMail.AddAttachment f.Path
+
+		objMail.Subject = "XXXXX"
+		objMail.TextBody = "XXXXX"
+		objMail.Send
+
+		FSO.MoveFile f.Path, FldrArch & f.Name
+
+		Set oFS = Nothing
+		Set objFlds = Nothing
+		Set objConf = Nothing
+		Set objMail = Nothing
+		
+	End If
+	
+Next
+
+WScript.Quit()
+
